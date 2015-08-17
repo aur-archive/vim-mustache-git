@@ -1,0 +1,40 @@
+# Maintainer: Andy Weidenbaum <archbaum@gmail.com>
+
+pkgname=vim-mustache-git
+pkgver=20131025
+pkgrel=1
+pkgdesc="Vim syntax file for Mustache and Handlebars"
+arch=('any')
+depends=('vim')
+makedepends=('git')
+groups=('vim-plugins')
+url="https://github.com/juvenn/mustache.vim"
+license=('MIT')
+source=(${pkgname%-git}::git+https://github.com/juvenn/mustache.vim)
+sha256sums=('SKIP')
+provides=('vim-mustache')
+conflicts=('vim-mustache')
+install=vimdoc.install
+
+pkgver() {
+  cd ${pkgname%-git}
+  git log -1 --format="%cd" --date=short | sed "s|-||g"
+}
+
+prepare() {
+  cd ${pkgname%-git}
+
+  msg 'Removing unneeded files...'
+  rm README.md example.mustache
+}
+
+package() {
+  cd ${pkgname%-git}
+
+  msg 'Installing...'
+  install -dm 755 ${pkgdir}/usr/share/vim/vimfiles/
+  tar -c . | tar -x -C ${pkgdir}/usr/share/vim/vimfiles
+
+  msg 'Cleaning up pkgdir...'
+  find "$pkgdir" -type d -name .git -exec rm -r '{}' +
+}
